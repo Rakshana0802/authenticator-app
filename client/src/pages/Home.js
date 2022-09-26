@@ -42,6 +42,7 @@ useEffect(()=>{
   }
   }	
   async function submit() {
+    
     const token=localStorage.getItem('token');
     try{
     const userdata= await axios.put('http://localhost:8080/user',{
@@ -71,7 +72,7 @@ useEffect(()=>{
                <p>User Name: {user.name}</p>
                { edit ? (
                 <div>
-                <input type="text" value={edit ? edituser.name : ""} onChange={(e) => setEditUser({...edituser,name:e.target.value})}></input>
+                <input type="text" value={edituser.name} onChange={(e) => setEditUser({...edituser,name:e.target.value})}></input>
                 </div>
                ):""
 
@@ -79,7 +80,7 @@ useEffect(()=>{
                <p>Email:  {user.email} </p>
                { edit && (
                 <div>
-                <input type="text" value={edit ? edituser.email : ""} onChange={(e) => setEditUser({...edituser,email:e.target.value})}></input>
+                <input type="text" value={ edituser.email} onChange={(e) => setEditUser({...edituser,email:e.target.value})}></input>
                 </div>
                )
 
@@ -87,16 +88,17 @@ useEffect(()=>{
                <p><img src={user.profilePicture}></img></p>
                { edit && (
                 <div>
-                <input type="text" value={edit ? edituser.profilePicture : ""} onChange={(e) => setEditUser({...edituser,profilePicture:e.target.value})}></input>
+                <input type="text" value={edituser.profilePicture} onChange={(e) => setEditUser({...edituser,profilePicture:e.target.value})}></input>
                 </div>
                )
 
                }
                <p>Last Active: {user.lastActive}</p>
-               <p><button onClick={()=>{setEdit(!edit)}}>{ edit ? "Back" : "Edit"}</button></p>
+               <p><button onClick={()=>{setEdit(!edit)}}>{ edit ? "Back" : "Edit"}</button>
                { edit &&
-               <p><button onClick={submit}>Submit</button></p>
+               <button onClick={submit}>Submit</button>
                }
+               </p>
               <p><button onClick={logoutuser}>Logout</button></p> 
       </div>
 	);

@@ -11,16 +11,16 @@ p {
     font-size: x-large;
   }
 img{
-    min-height: 25%;
-    min-width: 25%;
+    height: 184px;
 }
 button {
+  margin-right: 20px;
     font-family: "Roboto", sans-serif;
     text-transform: uppercase;
     outline: 0;
     background-color: #b973d5;
     background-image: linear-gradient(45deg,#6f328f,#9908ac);
-    width: 50%;
+    width: 30%;
     border: 0;
     padding: 15px;
     color: #FFFFFF;
