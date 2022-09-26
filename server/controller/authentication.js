@@ -1,5 +1,5 @@
 const User=require('../Model/Userschema');
-const GoogleUser=require('../Model/Googleuser');
+const Googleuser=require('../Model/Googleuser');
 const jwt=require('jsonwebtoken');
 const bcrypt=require('bcrypt');
 const {ObjectId}=require('mongoose').ObjectId;
@@ -27,12 +27,15 @@ const usercreation=async (req,res)=>{
               });
         }
         try{
-            const newuser=await User.create({name,email,password});
+            const lastActive=new Date();
+            const newuser=await User.create({name,email,password,lastActive});
             newuser.password=undefined;
+            
             jwt1={userID:newuser._id,userl:"website"}
             const token=jwt.sign(jwt1,process.env.JWT_SECRET,{ 
                 expiresIn: process.env.JWT_LIFETIME,
               });
+              
             res.status(200).json({user:newuser,token});
         }
         catch(err){
@@ -51,7 +54,7 @@ const userlogin=async (req,res,next)=>{
             message:"please provide all credential"
         })
     }
-    const existuser=await User.findOne({email})
+    let existuser=await User.findOne({email})
     .select("+password")
     .clone()
     .catch(function(err){
@@ -74,6 +77,10 @@ const userlogin=async (req,res,next)=>{
             message: "please enter valid credential",
           });
     }
+    const lastActive=new Date();
+    existuser=await User.findOneAndUpdate({email},{lastActive},{
+        new: true
+      });
     existuser.password=undefined;
     jwt1={userID:existuser._id,userl:"website"}
     const token=jwt.sign(jwt1,process.env.JWT_SECRET,{
@@ -94,7 +101,7 @@ const getUser=async (req,res)=>{
   console.log(id);
     console.log(req.user);
     if(req.user.userl=="website"){
-    const existuser=await User.findById(id)
+    let existuser=await User.findById(id)
     .clone()
     .catch(function (err) {
       console.log(err);
@@ -103,14 +110,20 @@ const getUser=async (req,res)=>{
         return res.status(400).json("user doesnotexist relogin");
        
     }
-  
+    const lastActive=new Date();
+  existuser=await User.findByIdAndUpdate(id,{lastActive},{
+    new: true
+  }) ;
+  if(existuser.password){
+    existuser.password=undefined;
+  }
     console.log("existuser");
     console.log(existuser);
     return res.status(200)
     .json({user:existuser});
 }
 else{
-    const existuser1=await GoogleUser.findById(id)
+    let existuser1=await Googleuser.findById(id)
     .clone()
     .catch(function (err) {
       console.log(err);
@@ -119,6 +132,11 @@ else{
         return res.status(400).json("user doesnotexist relogin");
        
     }
+    const lastActive=new Date();
+    existuser1=await Googleuser.findByIdAndUpdate(id,{lastActive},{
+      new: true
+    }) ;
+   
     console.log(existuser1);
     return res.status(200)
     .json({user:existuser1});
@@ -134,7 +152,7 @@ const googleusercreation=async (req,res)=>{
             message:"please provide all credential"
         })
     }
-    const userexists=await GoogleUser.findOne({email})
+    const userexists=await Googleuser.findOne({email})
     .clone()
     .catch(function (err) {
         console.log("here");
@@ -142,7 +160,8 @@ const googleusercreation=async (req,res)=>{
     });
     if(!userexists){
         try{
-            const newuser=await GoogleUser.create({name,email,profilePicture:profile});
+            const lastActive=new Date();
+            const newuser=await Googleuser.create({name,email,profilePicture:profile,lastActive});
             const token=jwt.sign({userID:newuser._id,userl:"google"},process.env.JWT_SECRET,{ 
                 expiresIn: process.env.JWT_LIFETIME,
               });
@@ -161,4 +180,54 @@ const googleusercreation=async (req,res)=>{
     }
    
 }
-module.exports={usercreation,userlogin,getUser,googleusercreation}
+const userUpdatation=async (req,res)=>{
+    console.log(req.body);
+    const id=req.user.userId;
+  id.toString();
+    const {username,email,profilePicture}=req.body.user;
+    
+    if(!username || !email || !profilePicture){
+        return res
+        .status(400)
+        .json({
+            success:false,
+            message:"please provide all details"
+        })
+    }
+    const update={name:username,email,profilePicture};
+    if(req.user.userl=="website"){
+        let existuser=await User.findById(id)
+        .clone()
+        .catch(function (err) {
+          console.log(err);
+        });
+        if(!existuser){
+            return res.status(400).json("user doesnotexist relogin");
+           
+        }
+        existuser=await User.findByIdAndUpdate(id,{...update},{new: true});
+      if(existuser.password){
+        existuser.password=undefined;
+      }
+        console.log("existuser");
+        console.log(existuser);
+        return res.status(200)
+        .json({user:existuser});
+    }
+    else{
+        let existuser1=await Googleuser.findById(id)
+        .clone()
+        .catch(function (err) {
+          console.log(err);
+        });
+        if(!existuser1){
+            return res.status(400).json("user doesnotexist relogin");
+           
+        }
+        existuser=await Googleuser.findByIdAndUpdate(id,{...update},{new: true});
+        console.log(existuser1);
+        return res.status(200)
+        .json({user:existuser1});
+    }
+}
+module.exports={usercreation,userlogin,getUser,googleusercreation,userUpdatation}

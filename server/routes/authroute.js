@@ -1,12 +1,13 @@
 const  express = require("express")
 const router = express.Router();
-const {usercreation,userlogin,getUser,googleusercreation}=require('../controller/authentication');
+const {usercreation,userlogin,getUser,googleusercreation,userUpdatation}=require('../controller/authentication');
 const authenticate =require('../middleware/authenticate');
 const passport=require('passport');
 router.route("/signup").post(usercreation);
 router.route("/login").post(userlogin);
 router.route("/user").post(authenticate,getUser);
 router.route("/googleuser").post(googleusercreation);
+router.route("/user").put(authenticate,userUpdatation);
 router.route("/login/success").get((req, res) => {
 	if (req.user) {
 		res.status(200).json({
