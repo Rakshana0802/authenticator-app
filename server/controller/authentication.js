@@ -183,6 +183,7 @@ const googleusercreation=async (req,res)=>{
 const userUpdatation=async (req,res)=>{
     console.log(req.body);
     const id=req.user.userId;
+    console.log(id);
   id.toString();
     const {username,email,profilePicture}=req.body.user;
     

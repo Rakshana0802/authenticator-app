@@ -12,7 +12,7 @@ function Home() {
 
  function logoutuser() {
   localStorage.setItem('token',"");
-    navigate('/login');
+  navigate('/login');
   }
 useEffect(()=>{
     loginUser();
@@ -42,11 +42,9 @@ useEffect(()=>{
   }
   }	
   async function submit() {
-    console.log(edituser);
     const token=localStorage.getItem('token');
     try{
     const userdata= await axios.put('http://localhost:8080/user',{
-      
             authorization:`Bearer ${token}`,
             user:edituser
         
@@ -70,12 +68,10 @@ useEffect(()=>{
   }
 	return (
         <div className="home-page">
-            <button onClick={()=>{setEdit(!edit)}}>Edit</button>
                <p>User Name: {user.name}</p>
                { edit ? (
                 <div>
-                <p>User Name:</p>
-                <input type="text" value={edituser.name} onChange={(e) => setEditUser({...edituser,username:e.target.value})} ></input>
+                <input type="text" value={edit ? edituser.name : ""} onChange={(e) => setEditUser({...edituser,name:e.target.value})}></input>
                 </div>
                ):""
 
@@ -83,8 +79,7 @@ useEffect(()=>{
                <p>Email:  {user.email} </p>
                { edit && (
                 <div>
-                <p>Email:</p>
-                <input type="text" value={edituser.email} onChange={(e) => setEditUser({...edituser,email:e.target.value})} ></input>
+                <input type="text" value={edit ? edituser.email : ""} onChange={(e) => setEditUser({...edituser,email:e.target.value})}></input>
                 </div>
                )
 
@@ -92,17 +87,17 @@ useEffect(()=>{
                <p><img src={user.profilePicture}></img></p>
                { edit && (
                 <div>
-                <p>profilePicture:</p>
-                <input type="text" value={edituser.profilePicture} onChange={(e) => setEditUser({...edituser,profilePicture:e.target.value})} ></input>
+                <input type="text" value={edit ? edituser.profilePicture : ""} onChange={(e) => setEditUser({...edituser,profilePicture:e.target.value})}></input>
                 </div>
                )
 
                }
                <p>Last Active: {user.lastActive}</p>
+               <p><button onClick={()=>{setEdit(!edit)}}>{ edit ? "Back" : "Edit"}</button></p>
                { edit &&
-               <button onClick={submit}>submit</button>
+               <p><button onClick={submit}>Submit</button></p>
                }
-              <button onClick={logoutuser}>Logout</button> 
+              <p><button onClick={logoutuser}>Logout</button></p> 
       </div>
 	);
   
